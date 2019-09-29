@@ -1,0 +1,51 @@
+//XOR ZEUG
+
+#include <stdio.h>
+#include <string.h>
+void encryptDecrypt(char inpString[])
+{
+    char xorKey = '1';
+    int len = strlen(inpString);
+    for (int i = 0; i < len; i++)
+    {
+        inpString[i] = inpString[i] ^ xorKey;
+        printf("%c",inpString[i]);
+    }
+}
+
+int main()
+{
+    char sampleString[] = "Mein Name is Leon\nHallo mein name ist auch Leon und heuzte";
+    printf("Encrypted String: ");
+    encryptDecrypt(sampleString);
+    printf("\n");
+    printf("Decrypted String: ");
+    encryptDecrypt(sampleString);
+
+    return 0;
+}
+
+
+
+
+//FILE OPEN READ
+
+#include <stdio.h>
+
+int main() {
+    FILE *fp;
+    char text[999];
+    fp = fopen("C:\\Users\\leonw\\Desktop\\Hallo.TXT", "r");
+    if(fp == NULL){
+        printf("File invalid!\n");
+    }
+    else{
+        while( !feof(fp) ){
+            fgets(text, 999, fp);
+            printf("%s", &text);
+        }
+     fclose(fp);
+    }
+
+    return 0;
+}
