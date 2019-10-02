@@ -3,7 +3,7 @@
 
 int main(){
     double a, p, q, sum, sum2;
-    printf("a, p, q eingeben / jeweils mit Leerzeie trennen:\n");
+    printf("\na, p, q eingeben / jeweils mit Leerzeie trennen:\n");
     scanf("%lf %lf %lf", &a, &p, &q);
     p = p / a;
     q = q / a;
@@ -11,5 +11,6 @@ int main(){
     sum2 = -(p * 0.5) - sqrt((p * 0.5) * (p * 0.5) - q);
     printf("Ergebnis: ");
     printf("%lf, %lf", sum, sum2);
+    int main();
     return 0;
 }
