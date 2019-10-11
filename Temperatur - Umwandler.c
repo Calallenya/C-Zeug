@@ -25,7 +25,7 @@ int main()
         scanf("%i",&unitIn);    // Input durch user
         if (unitIn < 1 || unitIn > 4){
             printf("Falsche Eingabe!");
-            main();
+            return 0;
         }
         while (getchar() != '\n');  // Input Buffer reset
 
@@ -34,13 +34,16 @@ int main()
         while (getchar() != '\n');  // Input Buffer reset
         if ((unitIn == 1 && tempIn < -273.15) || (unitIn == 2 && tempIn < -459.67) || (unitIn == 3 && tempIn < 0) || (unitIn == 4 && tempIn < -135.9038)){
             printf("Temperatur unter dem absoluten Nullpunkt!");
-            main();
+            return 0;
         }
         printf("\nIn welches Einheitensystem soll umgerechnet werden?\n\n");
         printf("1: grad C     2: grad F     3: K   4: Ro\n\n");
 
         printf("Ihre Wahl: ");
         scanf("%i",&unitOut);   // Input durch user
+        if (unitIn < 1 || unitIn > 4){
+            printf("Falsche Eingabe!");
+            return 0;
         while (getchar() != '\n');  // Input Buffer reset
 
         desiredConversion = unitIn * 10 + unitOut;
@@ -83,6 +86,8 @@ int main()
             case 43: tempOut = ((tempIn - 7.5) / 0.525) + 273.15;
                 printf("\n\n%.2fRo = %.2fK\n\n",tempIn,tempOut);
                 break;
+            default:
+               
         }
         printf("--------------------------------------------------\n");
         if (unitOut == 1){
@@ -127,9 +132,8 @@ int main()
             i = 0;
             for(i;i < sizeof(romer_beschriftung);i++) {
                 printf("%c", romer_beschriftung[i]);
-            }} else {
-            printf("Falsche Eingabe!");
-            main();
+            }}
+            
         }
 
         printf("\n\nerneute Berechnung? (j/n)");
