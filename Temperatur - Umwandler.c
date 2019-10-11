@@ -141,4 +141,5 @@ int main()
         while (getchar() != '\n');  // Input Buffer reset
         i = 0;  //i neu initialisieren, da bei Begin der do Schleife i noch den alten Wert hat
     } while(response == 'j' || response == 'J');    //Bedingung um 'do Schleife' zu wiederholen
+    return 0;
 }
