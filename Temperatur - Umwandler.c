@@ -91,7 +91,7 @@ int main()
 
         //Blocks zur Darstellung von Temperatur Skala
         if (unitOut == 1){  //Wenn Zieltemperatur °C ist
-            skala_fuer_temperaturanzeige = 100 - tempOut;
+            skala_fuer_temperaturanzeige = tempOut;
             if (skala_fuer_temperaturanzeige <= 0){
                 printf("\n");
             }
