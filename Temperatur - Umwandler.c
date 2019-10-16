@@ -14,7 +14,7 @@ int main()
     printf("\n\nProgramm zur Umrechnung von Temperaturen\n");
     printf("----------------------------------------\n");
 
-    do {    // Wiederhole den Block, so lange while() gültig ist
+    do {    // Wiederhole den Block, solange while() gültig ist
 
         printf("\nAus welchem Einheitensystem soll umgerechnet werden?\n\n");
         printf("1: grad C     2: grad F     3: K    4: Ro \n\n");
@@ -33,7 +33,7 @@ int main()
         // Input durch user
         scanf("%f", &tempIn);
         while (getchar() != '\n');
-        //Kontrolle ob Temperatur unter dem absoluten Nullpunk eingegeben wurde
+        //Kontrolle ob Temperatur unter dem absoluten Nullpunkt eingegeben wurde
         if ((unitIn == 1 && tempIn < -273.15) || (unitIn == 2 && tempIn < -459.67) || (unitIn == 3 && tempIn < 0) || (unitIn == 4 && tempIn < -135.9038)){
             printf("Temperatur unter dem absoluten Nullpunkt!");
             return -1;
@@ -52,7 +52,7 @@ int main()
         // Input Buffer leeren
         while (getchar() != '\n');
         desiredConversion = unitIn * 10 + unitOut;
-        //Abgleichung von Summe des Inputs mit verschiedenen Cases
+        //Abgleichung dsiesiredConveron mit verschiedenen Cases
         switch(desiredConversion)
         {
             case 12: tempOut = tempIn * 1.8 + 32.0;
@@ -129,7 +129,7 @@ int main()
             if(skala_fuer_temperaturanzeige <= 0){
                 printf("\n");
             }
-                //Überprüfen ob Temperatur über 100°C liegt | 180 = 212 - 32  (212F = 100°C) | -32, weil einfacherer zu rechnen, wenn untere Grenze 0 ist
+                //Überprüfen ob Temperatur über 100°C liegt | 180 = 212 - 32  (212F = 100°C) | -32, weil einfacher zu rechnen, wenn untere Grenze 0 ist
             else if (skala_fuer_temperaturanzeige >= 180){
                 while (i < 50) {printf("*");
                     i++;
@@ -196,6 +196,6 @@ int main()
         printf("\n\nerneute Berechnung? (j/n)");
         scanf("%c", &response);  // Input durch user
         while (getchar() != '\n');  // Input Buffer leeren
-        i = 0;  //i neu initialisieren, da bei Begin der do Schleife i noch den alten Wert hat
+        i = 0;  //i 0 zuweisen, da bei Begin der do Schleife i noch den alten Wert hat
     } while(response == 'j' || response == 'J');    //Bedingung um 'do Schleife' zu wiederholen
 }
