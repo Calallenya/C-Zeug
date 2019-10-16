@@ -21,7 +21,7 @@ int main()
         // Input durch user
         scanf("%d", &unitIn);
         //Kontroller ob user input gültig ist
-        if (unitIn < 1 || unitIn > 4.0){
+        if (unitIn < 1 || unitIn > 4){
             printf("Falsche Eingabe!");
             return -1;
         }
@@ -150,7 +150,7 @@ int main()
             //Kontrolle ob Zielemperatur K ist
             }} else if (unitOut == 3){
             //Rechnung selbes Prinzip wie bei F beschrieben
-            skala_fuer_temperaturanzeige = tempOut - 273;
+            skala_fuer_temperaturanzeige = tempOut - 273.15;
             if(skala_fuer_temperaturanzeige <= 0){
                 printf("\n");
             }
