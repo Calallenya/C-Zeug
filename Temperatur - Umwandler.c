@@ -10,6 +10,7 @@ int main()
     char gradf_beschriftung[] = "32F                                           212F";
     char kelvin_beschriftung[]= "273K                                          373K";
     char romer_beschriftung[] = "7.5Rø                                         60Rø";
+
     printf("\n\nProgramm zur Umrechnung von Temperaturen\n");
     printf("----------------------------------------\n");
 
@@ -20,7 +21,7 @@ int main()
         printf("Ihre Wahl: ");
         // Input durch user
         scanf("%d", &unitIn);
-        //Kontroller ob user input gültig ist
+        //Kontrolle ob user input gültig ist
         if (unitIn < 1 || unitIn > 4){
             printf("Falsche Eingabe!");
             return -1;
@@ -43,7 +44,7 @@ int main()
         printf("Ihre Wahl: ");
         // Input durch user
         scanf("%d",&unitOut);
-        //Kontroller ob user input gültig ist
+        //Kontrolle ob user input gültig ist
         if (unitIn < 1 || unitIn > 4) {
             printf("Falsche Eingabe!");
             return -1;
@@ -120,7 +121,7 @@ int main()
             for(i;i < sizeof(gradc_beschriftung);i++) {
                 printf("%c", gradc_beschriftung[i]);
 
-            //Kontrolle ob Zielemperatur F ist
+                //Kontrolle ob Zielemperatur F ist
             }} else if (unitOut == 2){
             //tempOut - 32, weil 0°C = 32F ist und * skala von 0°C  bis 100°C gehen soll
             skala_fuer_temperaturanzeige = tempOut - 32;
@@ -147,7 +148,7 @@ int main()
                 printf("%c", gradf_beschriftung[i]);
 
 
-            //Kontrolle ob Zielemperatur K ist
+                //Kontrolle ob Zielemperatur K ist
             }} else if (unitOut == 3){
             //Rechnung selbes Prinzip wie bei F beschrieben
             skala_fuer_temperaturanzeige = tempOut - 273.15;
@@ -169,7 +170,7 @@ int main()
             for(i;i < sizeof(kelvin_beschriftung);i++) {
                 printf("%c", kelvin_beschriftung[i]);
 
-            //Kontrolle ob Zielemperatur Ro ist
+                //Kontrolle ob Zielemperatur Ro ist
             }} else if (unitOut == 4){
             //Rechnung selbes Prinzip wie bei F beschrieben
             skala_fuer_temperaturanzeige = tempOut - 7.5;
