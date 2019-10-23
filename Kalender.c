@@ -3,9 +3,9 @@
 #include <math.h>
 int day_of_the_year(int tag, int monat, bool sjahr);
 const char *new_year_day(double tag, int monat, double jahr, double last_two_digits_of_year, double first_two_digits_of_year);
-int kalenderwoche(double tag, int monat, int year, bool sjahr, double i);
+int kalenderwoche(double tag, int monat, int year, bool sjahr, double i, double t);
 int main(){
-    int tag_nummber, day, month, year, last_two_digits_of_year = 0, first_two_digits_of_year = 0, i = 1;
+    int tag_nummber, day, month, year, last_two_digits_of_year = 0, first_two_digits_of_year = 0;
     bool schaltjahr = false;
     printf("Datum eingeben [Tag] [Monat] [Jahr]\n");
     scanf("%d %d %d", &day, &month, &year);
@@ -53,9 +53,12 @@ int main(){
 
 
     printf("\nEs ist der %d. Tag des Jahres %d\n", day_of_the_year(day, month, schaltjahr), year);
+
     printf("Der eingegebene Tag ist ein: %s\n", new_year_day(day, month, year, last_two_digits_of_year = 0, first_two_digits_of_year = 0));
+
     printf("Der 1.Januar des Jahres %d ist ein: %s\n", year, new_year_day(1, 1, year, last_two_digits_of_year = 0, first_two_digits_of_year = 0));
-    kalenderwoche(day_of_the_year(day, month, schaltjahr), month, year, schaltjahr, i);
+
+    printf("Kalenderwoche: %d", kalenderwoche(day_of_the_year(day, month, schaltjahr), month, year, schaltjahr, 1, 1));
     return 0;
 }
 
@@ -93,19 +96,56 @@ const char *new_year_day(double tag, int monat, double jahr, double last_two_dig
 }
 
 
-int kalenderwoche(double tag, int monat, int year, bool sjahr, double i) {
-    while (new_year_day(i, 1, year, 0.0, 0.0) != "Donnerstag") {
+int kalenderwoche(double tag, int monat, int year, bool sjahr, double i, double t) {
+    //i ist das Tag-Datum des ersten Donnerstag im Jahr
+    while(new_year_day(i, 1, year, 0.0, 0.0) != "Donnerstag"){
         i++;
     }
-
-    tag = tag - (i - 3);
-    i = i - 3;  //Datum des ersten Montags der ersten Woche des Jahres
-    printf("\n%f", ceil(tag / 7.0));
-
-    if(ceil(tag / 7.0) > 52){
-        return 1;
-} else{
-        return ceil(tag / 7.0);
+    //Wenn der erste Tag des Jahres ein Mittwoch ist
+    if(new_year_day(t, 1, year, 0.0, 0.0) != "Mittwoch"){
+        t = 0;
     }
+
+
+
+
+    //Kontrolle auf Schaltjahr
+    if(sjahr){
+        //Kontrolle ob der erste Tag im Schaltjahr Mittwoch oder Donnerstag ist
+        if(i == 1 || t == 1){
+        }   //Wenn der ausgewählte Tag in der ersten Kalenderwoche des nächsten Jahres liegt
+        printf("%f", tag / 7.0);
+            if(ceil(tag / 7.0) > 53){   //53 da ein Schaltjahr welches Mittwoch oder Donnerstag beginnt 53 Kalenderwochen hat
+                return 1;
+        } else{
+                return ceil(tag / 7.0);
+            }
+    }
+
+
+
+
+
+
+
+
+    /*
+    if(i  -  3 < 1) {
+        tag += 1 - (i - 3);
+    }
+     */
+    
+
+    if(ceil(tag / 7.0) > 52) {      //wenn - woche = 0
+        return 1;
+    }
+    //Wenn der erste Januar ein Donnerstag ist und somit das Jahr 53 Kalenderwochen hat
+
+    printf("\n%f\n", 1 - (i - 3));
+    printf("\n%f\n", tag / 7.0);
+    printf("\n%f\n", ceil(tag / 7.0));
+
 }
 
+
+//if i - 3 < i - i + 1 dann tag + differez aus (i - i + 1) - i - 3
