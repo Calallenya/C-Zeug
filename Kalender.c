@@ -4,6 +4,8 @@
 int day_of_the_year(int tag, int monat, bool sjahr);
 const char *new_year_day(double tag, int monat, double jahr, double last_two_digits_of_year, double first_two_digits_of_year);
 int kalenderwoche(double tag, int monat, int year, bool sjahr, double i, double t);
+int anzahl_kalenderwochen(int year, bool sjahr, int i, int t);
+bool sjahr(int year);
 int main(){
     int tag_nummber, day, month, year, last_two_digits_of_year = 0, first_two_digits_of_year = 0;
     bool schaltjahr = false;
@@ -16,11 +18,11 @@ int main(){
         return -1;
     }
 
-
-    //Überprüfung auf Schaltjahr
-    if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
-        schaltjahr = true;
+    if(sjahr(year)){
         printf("\nDas Jahr %d ist ein Schaltjahr", year);
+        schaltjahr = true;
+    }else{
+        printf("\n Das Jahr %d ist kein Schaltjahr", year);
     }
 
 
@@ -58,7 +60,7 @@ int main(){
 
     printf("Der 1.Januar des Jahres %d ist ein: %s\n", year, new_year_day(1, 1, year, last_two_digits_of_year = 0, first_two_digits_of_year = 0));
 
-    printf("Kalenderwoche: %d", kalenderwoche(day_of_the_year(day, month, schaltjahr), month, year, schaltjahr, 1, 1));
+    printf("Kalenderwoche: %d", kalenderwoche(day_of_the_year(day, 0, schaltjahr), month, year, schaltjahr, 1, 1));
     return 0;
 }
 
@@ -96,56 +98,63 @@ const char *new_year_day(double tag, int monat, double jahr, double last_two_dig
 }
 
 
-int kalenderwoche(double tag, int monat, int year, bool sjahr, double i, double t) {
+int kalenderwoche(double tag, int kalenderwochen, int year, bool syear, double i, double t) {
     //i ist das Tag-Datum des ersten Donnerstag im Jahr
-    while(new_year_day(i, 1, year, 0.0, 0.0) != "Donnerstag"){
+    while (new_year_day(i, 1, year, 0.0, 0.0) != "Donnerstag") {
         i++;
     }
-    //Wenn der erste Tag des Jahres ein Mittwoch ist
-    if(new_year_day(t, 1, year, 0.0, 0.0) != "Mittwoch"){
-        t = 0;
-    }
+    kalenderwochen = anzahl_kalenderwochen(year, syear, 1, 1);
+    if (i - 3 > 0) {
+        tag += 1 - (i - 3);
 
-
-
-
-    //Kontrolle auf Schaltjahr
-    if(sjahr){
-        //Kontrolle ob der erste Tag im Schaltjahr Mittwoch oder Donnerstag ist
-        if(i == 1 || t == 1){
-        }   //Wenn der ausgewählte Tag in der ersten Kalenderwoche des nächsten Jahres liegt
-        printf("%f", tag / 7.0);
-            if(ceil(tag / 7.0) > 53){   //53 da ein Schaltjahr welches Mittwoch oder Donnerstag beginnt 53 Kalenderwochen hat
-                return 1;
-        } else{
-                return ceil(tag / 7.0);
-            }
-    }
-
-
-
-
-
-
-
-
-    /*
-    if(i  -  3 < 1) {
+    } else if (i - 3 < 0) {
         tag += 1 - (i - 3);
     }
-     */
-    
 
-    if(ceil(tag / 7.0) > 52) {      //wenn - woche = 0
+    //Kontrolle ob das jahr 53 Kalenderwochen hat
+    if (kalenderwochen == 53) {
+        if (ceil(tag / 7.0) > 53) {   //53 da ein Schaltjahr welches Mittwoch oder Donnerstag beginnt 53 Kalenderwochen hat
+            return 1;
+        }
+    } else if (ceil(tag / 7.0) > 52) {      //wenn - woche = 0
         return 1;
+
     }
-    //Wenn der erste Januar ein Donnerstag ist und somit das Jahr 53 Kalenderwochen hat
 
-    printf("\n%f\n", 1 - (i - 3));
-    printf("\n%f\n", tag / 7.0);
-    printf("\n%f\n", ceil(tag / 7.0));
+    //Kontrolle ob Tag in der letzten Kalenderwoche des letzten Jahres liegt
+    if(tag / 7.0 <= 0){
+        return anzahl_kalenderwochen(year - 1, sjahr(year - 1), 1,1);
+    }
+    return ceil(tag / 7.0);
 
+        printf("\n%f\n", 1 - (i - 3));
+        printf("\n%f\n", tag / 7.0);
+        printf("\n%f\n", ceil(tag / 7.0));
 }
 
 
-//if i - 3 < i - i + 1 dann tag + differez aus (i - i + 1) - i - 3
+int anzahl_kalenderwochen(int year, bool sjahr, int i, int t) {
+        //Wenn der erste Tag des Jahres ein Donnerstag ist
+        if (new_year_day(i, 1, year, 0.0, 0.0) != "Donnerstag") {
+            i = 0;
+        }
+        //Wenn der erste Tag des Jahres ein Mittwoch ist
+        if (new_year_day(t, 1, year, 0.0, 0.0) != "Mittwoch") {
+            t = 0;
+        }
+
+        if (i == 1 || (t == 1 && sjahr)) {
+            return 53;
+        } else {
+            return 52;
+        }
+}
+
+
+bool sjahr(year){
+    if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
+        return true;
+    }else{
+        return false;
+    }
+}
