@@ -1,16 +1,19 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+//Funktionen Deklarationen
 int tag_nummer(int tag, int monat, bool schaltjahr);
-const char *wochentag(double tag, int monat, double jahr, double last_two_digits_of_year, double first_two_digits_of_year);
+static char *wochentag(double tag, int monat, double jahr, double last_two_digits_of_year, double first_two_digits_of_year);
 int kalenderwoche(double tag, int kalenderwochen, int year, bool schaltjahr, int i);
 int anzahl_kalenderwochen(int year, bool sjahr, int i, int t);
 bool sjahr(int year);
 
 
 int main(){
+    //Variablen erstellen
     int  day, month, year;
     bool schaltjahr;
+    //Eingabe Beispiel: 5 11 2019
     printf("Datum eingeben [Tag] [Monat] [Jahr]\n");
     scanf("%d %d %d", &day, &month, &year);
 
@@ -77,19 +80,22 @@ int main(){
 int tag_nummer(int tag, int monat, bool schaltjahr){
     //Zweite Zeile für Schaltjahr
     static const int tage [2][13] = {
+            //Zwei Nullen, da Monat 1 <= Monat, somit kann Moant nicht der erste Eintrag sein, deswegen erste 0 dummy eintrag   |   Man könnte auch Monat - 1 rechnen
             {0, 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334},
             {0, 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335}
     };
     if(!schaltjahr){
+        //Kein Schatljahr
         return tage[0][monat] + tag;
     } else{
+        //Schaltjahr
         return tage[1][monat] + tag;
     }
 }
 
 
 //Für Rechnung siehe: https://de.wikipedia.org/wiki/Wochentagsberechnung
-const char* wochentag(double tag, int monat, double jahr, double last_two_digits_of_year, double first_two_digits_of_year){
+static char* wochentag(double tag, int monat, double jahr, double last_two_digits_of_year, double first_two_digits_of_year){
     static const int nummer_monate [12] = {11, 12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
     static char* wochentage[] = {"Sonntag", "Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag"};
     double m = nummer_monate[monat - 1];
@@ -104,6 +110,7 @@ const char* wochentag(double tag, int monat, double jahr, double last_two_digits
     if (wochentag < 0){
         wochentag += 7;
     }
+    //Return pointer zu array
     return wochentage[wochentag];
 }
 
@@ -111,9 +118,12 @@ const char* wochentag(double tag, int monat, double jahr, double last_two_digits
 int kalenderwoche(double tag, int kalenderwochen, int year, bool syear, int i) {
     while (wochentag(i, 1, year, 0.0, 0.0) != "Donnerstag") {
         i++;
+        //i = Tag des ersten Donnerstags
     }   //i - 3 = Montag der ersten Kalenderwoche
+    //Tag vergrößert um Tage aus dem letzten Jahr die in der ersten Kalenderwoche des aktuellen Jahres liegen
     if(i - 3 < 1){
         tag += 1 - (i - 3);
+    //Aktueller Tag wird verkleinert, um Tage die in der letzten Kalenderwoche des vorherigen Jahres liegen    
     } else if (i - 3 > 1){
         tag += 1 - (i - 3);
     }
@@ -121,18 +131,18 @@ int kalenderwoche(double tag, int kalenderwochen, int year, bool syear, int i) {
     //Block zur Kontrolle ob der Tag in der ersten Kalenderwoche des nächsten Jahres liegt
     if (kalenderwochen == 53) {
         if (ceil(tag / 7.0) > 53) {
-            return 1;
+            return 1;   //1 weil erste Kalenderwoche im nächsten Jahr
         }
     } else if(ceil(tag / 7) > 52){
-        return 1;
+        return 1;   //1 weil erste Kalenderwoche im nächsten Jahr
     }
 
     //Block zur Kontrolle ob der Tag in der letzten Kalenderwoche des vorherigen Jahres liegt
     if(tag / 7.0 <= 0) {
-        return anzahl_kalenderwochen(year - 1, sjahr(year - 1), 1, 1);
+        return anzahl_kalenderwochen(year - 1, sjahr(year - 1), 1, 1);  //Letzte Kalenderwoche des vorherigen Jahres
     }
 
-    return ceil(tag / 7);
+    return ceil(tag / 7);   //Kalenderwoche des eingegebenen Tages, wenn dieser in einer Kalenderwoche des aktuellen Jahres liegt
 }
 
 
@@ -155,6 +165,7 @@ int anzahl_kalenderwochen(int year, bool schaltjahr, int i, int t) {
 
 
 bool sjahr(year){
+    //Rechnung um Schaltjahr zu ermitteln
     if((year % 4 == 0 && year % 100 != 0) || year % 400 == 0) {
         return true;
     }else{
