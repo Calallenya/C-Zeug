@@ -24,15 +24,15 @@ int read_e_series()
 
 int read_decade()
 {
-    while(1)
-    {
-        int n;
+    while(1) {
+        int n = 0;
         printf("\nBitte geben Sie den Dekadenfaktor an: ");
-        scanf(" %i",&n);
-        while (getchar() != '\n');
-        if (n == 0 || n == 1 || n == 2) return n;
-        printf("\n\nungueltige Eingabe (%i)!\n\n",n);
-        printf("gueltige Werte: 0, 1, 2!\n\n");
+        //Wenn scanf kein Int als Eingabe Wert bekommt wird 0 ausgegben
+        if (scanf(" %d", &n) != 1) {
+            while (getchar() != '\n');
+            continue;
+        }
+        return n;
     }
 }
 
@@ -49,46 +49,58 @@ double get_tolerance(int e){
 }
 
 
-int oo(double n, double m, double t) {
-    int i;
-    double tabl[3][192] = {{}, {}, {}}, r = 0;
+//Die grafische Ausgabe ist nur für kleinere m Werte ausgelegt, also nicht m = 100
+double table(double n, double m, double t) {
+    int i, user_input = 0;
+    double tabl[4][192] = {{}, {}, {}}, r = 0;
     printf("\n+---------------------------------------------+\n");
     printf("|\t     Widerstandsreihe E - %d\t      |", (int) n);
     printf("\n+---------------------------------------------+\n");
     printf("|\t- 5%%\t|\tR\t|\t+ 5%%  |");
     printf("\n+---------------------------------------------+\n");
-    for (i = 0; i <= n; i++){
-        r = (pow(pow(10, 1 / n), i) * pow(10, m));//    double tabl[2][(int) n - 1], r = 0;
+    for (i = 0; i < n; i++){
+        r = (pow(pow(10, 1 / n), i) * pow(10, m));
 
-        tabl[0][i - 1] = r * (1 - t);
-        if(pow(10, m + 1) / tabl[0][i - 1] <= 1){
-            printf("|  %.5f\t", tabl[0][i - 1]);
-        } else{
-            printf("|  %f\t", tabl[0][i - 1]);
-        }
-        tabl[1][i - 1] = r;
+
+        // -5 %
+        tabl[1][i - 1] = r * (1 - t);
         if(pow(10, m + 1) / tabl[1][i - 1] <= 1){
             printf("|  %.5f\t", tabl[1][i - 1]);
-        }else{
+        } else{
             printf("|  %f\t", tabl[1][i - 1]);
         }
-        tabl[2][i - 1] = r * (1 + t);
+
+        //R
+        tabl[2][i - 1] = r;
         if(pow(10, m + 1) / tabl[2][i - 1] <= 1){
-            printf("|  %.5f  |\n", tabl[2][i - 1]);
+            printf("|  %.5f\t", tabl[2][i - 1]);
         }else{
-            printf("|  %f  |\n", tabl[2][i - 1]);
+            printf("|  %f\t", tabl[2][i - 1]);
+        }
+
+        // +5 %
+        tabl[3][i - 1] = r * (1 + t);
+        if(pow(10, m + 1) / tabl[3][i - 1] <= 1){
+            printf("|  %.5f  |", tabl[2][i - 1]);
+        }else{
+            printf("|  %f  |", tabl[3][i - 1]);
+        }
+
+        //Nummerierung
+        tabl[0][i] = i + 1;
+        printf(" %d\n", i + 1);
+    }
+    printf("+---------------------------------------------+\n\n");
+    while(1) {
+        printf("Index eines Wertes aus der Liste angeben: ");
+        scanf("%d", &user_input);
+        while (getchar() != '\n');
+        if(user_input > 0 && user_input <= n){
+            return user_input;
         }
     }
-    printf("+---------------------------------------------+\n");
-    return 1;
+    return user_input;
 }
-// Konstanten fuer den Zugriff in der Tabelle
-// 1. Spalte: Nennwert-Toleranz
-// 2. Spalte: Nennwert
-// 3. Spalte: Nennwert+Toleranz
-#define LOWER_BOUND 0
-#define SET_VALUE 1
-#define UPPER_BOUND 2
 
 
 int main()
@@ -100,15 +112,10 @@ int main()
     int e_series = read_e_series();
     int decade = read_decade();
     double tolerance = get_tolerance(e_series);
-    oo(e_series, decade, tolerance);
-    /*
-    // bestimme erst die Toleranz und dann die Werte der Tabelle -
-    // in jeder Zeile jeweils untere Grenze, Sollwert und obere Grenze
-    double table[192][3];
-    double tolerance = compute_tolerance(e_series);
-    compute_values(e_series, decade, tolerance, table);
-    print_table(e_series, table);
+    table(e_series, decade, tolerance);
 
+/*
+ *
     // bestimme die Farbcodierung eines gewaehlten Widerstands
     char coding[80];
     int n = read_list_number(e_series);
