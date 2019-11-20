@@ -1,4 +1,3 @@
-
 #include <stdio.h>
 #include <math.h>
 
@@ -32,6 +31,9 @@ int read_decade()
             while (getchar() != '\n');
             continue;
         }
+        if (n < 0 || n > 2){
+            continue;
+        }
         return n;
     }
 }
@@ -50,7 +52,7 @@ double get_tolerance(int e){
 
 
 //Die grafische Ausgabe ist nur für kleinere m Werte ausgelegt, also nicht m = 100
-double table(double n, double m, double t) {
+int table(double n, double m, double t) {
     int i, user_input = 0;
     double tabl[4][192] = {{}, {}, {}}, r = 0;
     printf("\n+---------------------------------------------+\n");
@@ -96,23 +98,65 @@ double table(double n, double m, double t) {
         scanf("%d", &user_input);
         while (getchar() != '\n');
         if(user_input > 0 && user_input <= n){
-            return user_input;
+            return tabl[2][user_input - 2];
         }
     }
-    return user_input;
 }
 
+
+static char* color_code(int r, int m, double tolerance){
+    int i; //Int für Schleife
+    int return_values[5] = {0, 0, 0, 0, 0};
+    double tolerances[4] = {0.01, 0.02, 0.5, 0.10};
+    static char* colors[] = {"black", "brown", "red", "orange", "yellow", "green", "blue", "purple", "gray", "white", "gold", "silver"};
+    char* return_char;
+    switch (m){
+        case 0: return_values[2] = r;
+        case 1: return_values[1] = floor(r / 10);
+                return_values[2] = r % 10;
+        case 2: while(r) {
+                return_values[sizeof(r) - 1] = r % 10;
+                r /= 10;
+            }
+    }
+    return_values[4] = r;
+    for(i = 0;i < 4;i++) {
+        if (tolerance == tolerances[i]) {
+            switch (i) {
+                case 0:
+                    return_values[4] = 1;
+                case 1:
+                    return_values[4] = 3;
+                case 2:
+                    return_values[4] = 10;
+                case 3:
+                    return_values[4] = 11;
+            }
+        }
+    }
+    return colors;
+
+
+
+}
 
 int main()
 {
     printf("\n\nProgramm zur Berechnung von Widerstandsreihen\n");
     printf("--------------------------------------------------------\n");
 
+    int score = 345;
+    while(score){
+        printf("%d\n", score % 10);
+        score /= 10;
+    }
     // lese gewuenschte E-Reihe und Dekade
     int e_series = read_e_series();
     int decade = read_decade();
     double tolerance = get_tolerance(e_series);
-    table(e_series, decade, tolerance);
+    int x = table(e_series, decade, tolerance);
+    char n = color_code(x, decade, tolerance);
+    printf("\n%c", n);
 
 /*
  *
