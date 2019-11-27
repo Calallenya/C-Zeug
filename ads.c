@@ -40,7 +40,7 @@ int main()
         if (len == EOF)
             break;
         else if (len == 0) {
-            printf("Unerwartetes Zeichen in der Eingabedatei.");
+            printf("Unerwartetes Zeichen in der Eingabedatei.\nquitting...");
             scanf("%c", &resp);
             exit(EXIT_FAILURE);
         }
@@ -54,6 +54,7 @@ int main()
 
     // finally close the input file and clean up memory
     fclose(fp);
+
 
     //Error check
 
@@ -73,13 +74,8 @@ int main()
         }
     }
 
-    //Check for 
 
-
-
-
-
-    //Calculation
+    //Area calculation
 
     for(i = 0;i < counter - 1;i++) {
         sum1 += array[0][i] * array[1][i + 1];
@@ -89,11 +85,25 @@ int main()
     sum2 += array[1][counter - 1] * array[0][0];
     double total = fabs(sum1 - sum2) * 0.5;
 
+    //Geometric focus calculation
+    double x_point = 0, y_point = 0;
+
+    for(i = 0;i < counter - 1;i++){
+        x_point += ((array[0][i] + array[0][i + 1]) * ((array[0][i] * array[1][i + 1]) - (array[0][i + 1] * array[1][i])));
+        y_point += ((array[1][i] + array[1][i + 1]) * ((array[0][i] * array[1][i + 1]) - (array[0][i + 1] * array[1][i])));
+    }
+    x_point *= 1 / (6 * total);
+    y_point *= 1 / (6 * total);
+
+
 
     // output results
     printf("\nErgebnisse:\n");
     printf("-----------");
     printf("\nArea: %lf",total);
+    printf("\nGeometrischer Schwerpunkt:\nX: %lf", x_point);
+    printf("\nY: %lf", y_point);
+
 
 
 
