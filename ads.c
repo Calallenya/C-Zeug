@@ -1,17 +1,22 @@
+
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-int polygonArea(double *arr, int array_size);
+
+double polygon(double * array, int size);
 int main()
 {
+
     // variables for reading the measurements from file
     FILE * fp;
     size_t len = 0;
     char resp;
-    double x, y, arr[999];
-    int counter = 0;
+
+    int counter = 0, i, n;
+    double x, y, sum1 = 0, sum2 = 0;
+    double array[2][200];
     // open the input file "messwerte.txt" for reading
     fp = fopen("polygon.txt", "r");
     if (fp == NULL)
@@ -24,48 +29,75 @@ int main()
     }
 
     // print program header
-    printf("Programm zur Berechnung eines Polygons\n");
+    printf("\n\nProgramm zur Berechnung eines Polygons\n");
     printf("--------------------------------------------------------\n");
 
     // the following loop reads a new value in every iteration
     // until the end of the file or some invalid token is found
-    //Numbers only are printed and not saved
-
-    while(1) {
+    while (1) {
         len = fscanf(fp, "%lf %lf", &x, &y);
-        if(len == EOF){
-            break;
-        }
 
-         if (len == 0) {
+        if (len == EOF)
+            break;
+        else if (len == 0) {
             printf("Unerwartetes Zeichen in der Eingabedatei.");
             scanf("%c", &resp);
             exit(EXIT_FAILURE);
         }
-         //Even numbers = x  uneven numbers = y
-        arr[0] = x;
-        arr[1 + counter] = y;
         printf("Lese Eckpunkt: %6.2f/%6.2f\n", x, y);
-        counter++;
-    }
-    polygonArea(&arr[999], counter);
 
-    // output results
-    printf(" \nErgebnisse:\n");
-    printf("-----------\n\n");
+        array[0][counter] = x;
+        array[1][counter] = y;
+        counter++;
+
+    }
 
     // finally close the input file and clean up memory
     fclose(fp);
-    // wait for user input before closing terminal
-    scanf("%c", &resp);
-}
 
+    //Error check
 
-int polygonArea(double *arr, int array_size){
-    double sum1 = 0, sum2 = 0;
-    for(int n = 0;n < array_size;n++){
-        sum1 += arr[n] * arr[n + 3];
-        sum2 += arr[n + 1] * arr[n + 2];
+    //Check if less than 3 points are given
+    if(counter < 3){
+        printf("\nNicht ausreichende Eckpunkte: %d\nquitting...", counter);
+        exit(EXIT_FAILURE);
     }
-    sum1 += 
+
+    //Check for dublicates
+    for(i = 0;i < counter;i++){
+        for(n = 0;n < counter;n++){
+            if(array[0][i] == array[0][n] && array[1][i] == array[1][n] && n != i){
+                printf("\nDoppelte Eckpunkte: x: %lf y: %lf\nquitting...", array[0][i], array[1][i]);
+                exit(EXIT_FAILURE);
+            }
+        }
+    }
+
+    //Check for 
+
+
+
+
+
+    //Calculation
+
+    for(i = 0;i < counter - 1;i++) {
+        sum1 += array[0][i] * array[1][i + 1];
+        sum2 += array[1][i] * array[0][i + 1];
+    }
+    sum1 += array[0][counter - 1] * array[1][0];
+    sum2 += array[1][counter - 1] * array[0][0];
+    double total = fabs(sum1 - sum2) * 0.5;
+
+
+    // output results
+    printf("\nErgebnisse:\n");
+    printf("-----------");
+    printf("\nArea: %lf",total);
+
+
+
+    // wait for user input before closing terminal
 }
+
+
