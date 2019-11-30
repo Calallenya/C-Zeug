@@ -1,11 +1,10 @@
-
 #define _CRT_SECURE_NO_WARNINGS
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-double polygon(double * array, int size);
+int pnpoly(int nvert, double *vertx, double *verty, double testx, double testy);
 int main()
 {
 
@@ -15,7 +14,8 @@ int main()
     char resp;
 
     int counter = 0, i, n;
-    double x, y, sum1 = 0, sum2 = 0;
+    double x, y, sum1 = 0, sum2 = 0, X = 0, Y = 0;
+    //Array for saving x and y
     double array[2][200];
     // open the input file "messwerte.txt" for reading
     fp = fopen("polygon.txt", "r");
@@ -37,6 +37,7 @@ int main()
     while (1) {
         len = fscanf(fp, "%lf %lf", &x, &y);
 
+        //If End Of File(EOF) is reached break
         if (len == EOF)
             break;
         else if (len == 0) {
@@ -46,6 +47,7 @@ int main()
         }
         printf("Lese Eckpunkt: %6.2f/%6.2f\n", x, y);
 
+        //put x and y into the array
         array[0][counter] = x;
         array[1][counter] = y;
         counter++;
@@ -83,31 +85,72 @@ int main()
     }
     sum1 += array[0][counter - 1] * array[1][0];
     sum2 += array[1][counter - 1] * array[0][0];
-    double total = fabs(sum1 - sum2) * 0.5;
+    double total_area = fabs(sum1 - sum2) * 0.5;
 
     //Geometric focus calculation
     double x_point = 0, y_point = 0;
 
-    for(i = 0;i < counter - 1;i++){
+    for(i = 0;i < counter;i++){
         x_point += ((array[0][i] + array[0][i + 1]) * ((array[0][i] * array[1][i + 1]) - (array[0][i + 1] * array[1][i])));
         y_point += ((array[1][i] + array[1][i + 1]) * ((array[0][i] * array[1][i + 1]) - (array[0][i + 1] * array[1][i])));
     }
-    x_point *= 1 / (6 * total);
-    y_point *= 1 / (6 * total);
-
+    x_point *= (1 / (6 * total_area));
+    y_point *= (1 / (6 * total_area));
 
 
     // output results
     printf("\nErgebnisse:\n");
     printf("-----------");
-    printf("\nArea: %lf",total);
+    printf("\nArea: %lf", total_area);
     printf("\nGeometrischer Schwerpunkt:\nX: %lf", x_point);
-    printf("\nY: %lf", y_point);
+    printf("Y: %lf", y_point);
 
 
+    //User Input for point
+    printf("\n\nPunkt zum Boren angeben\nX: ");
+    //If scanf gets wrong input exit
+    if(scanf("%lf", &X) != 1){
+        printf("\nWrong input quitting...");
+        exit(EXIT_FAILURE);
+    }
+
+    //reset input buffer
+    while (getchar() != '\n');
+    printf("\nY: ");
+    //If scanf gets wrong input exit
+    if(scanf("%lf", &Y) != 1){
+        printf("\nWrong input quitting...");
+        exit(EXIT_FAILURE);
+    }
+
+    //Call function
+    int check_for_point = pnpoly(counter - 1, &array[0][0], &array[1][0], X, Y);
+
+    if(check_for_point == 0){
+        printf("\nPunkt X: %lf Y: %lf ist nicht vorhanden", X , Y);
+    }else if(check_for_point == 1){
+        printf("\nPunkt X: %lf Y: %lf ist vorhanden", X, Y);
+    }else{
+        printf("\nsomething went  wrong\nquitting...");
+        exit(EXIT_FAILURE);
+    }
 
 
     // wait for user input before closing terminal
+    while (getchar() != '\n');
+    printf("\nPress Enter to exit");
+    scanf("%c", &resp);
 }
 
 
+//Copyright (c) 1970-2003, Wm. Randolph Franklin
+int pnpoly(int nvert, double *vertx, double *verty, double testx, double testy)
+{
+    int i, j, c = 0;
+    for (i = 0, j = nvert-1; i < nvert; j = i++) {
+        if ( ((verty[i]>testy) != (verty[j]>testy)) &&
+             (testx < (vertx[j]-vertx[i]) * (testy-verty[i]) / (verty[j]-verty[i]) + vertx[i]) )
+            c = !c;
+    }
+    return c;
+}
