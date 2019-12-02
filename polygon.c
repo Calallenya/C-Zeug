@@ -1,29 +1,32 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+//for X in code 0 is set | for Y in code 1 is set
+//for easier visualisation
+#define X 0
+#define Y 1
+
+//Function declaration
 int pnpoly(int nvert, double *vertx, double *verty, double testx, double testy);
 int main()
 {
-
     // variables for reading the measurements from file
     FILE * fp;
     size_t len = 0;
     char resp;
 
     int counter = 0, i, n;
-    double x, y, sum1 = 0, sum2 = 0, X = 0, Y = 0;
+    double x, y, sum1 = 0, sum2 = 0;
     //Array for saving x and y
     double array[2][200];
     // open the input file "messwerte.txt" for reading
-    fp = fopen("polygon.txt", "r");
+    fp = fopen("polygo.txt", "r");
     if (fp == NULL)
     {
         // if file could not be opened (wrong path, not readable, ...)
-        // output a short message and immediately exit
-        printf("Eingabedatei kann nicht geoeffnet werden.\n");
+        // output a short message and exit after user presses Enter
+        printf("Eingabedatei kann nicht geoeffnet werden.\nPress Enter to exit");
         scanf("%c", &resp);
         exit(EXIT_FAILURE);
     }
@@ -48,8 +51,9 @@ int main()
         printf("Lese Eckpunkt: %6.2f/%6.2f\n", x, y);
 
         //put x and y into the array
-        array[0][counter] = x;
-        array[1][counter] = y;
+        //array[X][i] = x coordinate | array[Y][i] = y coordinate, because X = 0 and Y = 1
+        array[X][counter] = x;
+        array[Y][counter] = y;
         counter++;
 
     }
@@ -66,11 +70,13 @@ int main()
         exit(EXIT_FAILURE);
     }
 
-    //Check for dublicates
+    //Check for duplicate
+    //Check every x and y coordinate pair with all other pairs
     for(i = 0;i < counter;i++){
         for(n = 0;n < counter;n++){
-            if(array[0][i] == array[0][n] && array[1][i] == array[1][n] && n != i){
-                printf("\nDoppelte Eckpunkte: x: %lf y: %lf\nquitting...", array[0][i], array[1][i]);
+            //Check if coordinates are the same and if it is not the same coordinate than the one which is tested
+            if(array[X][i] == array[X][n] && array[Y][i] == array[Y][n] && n != i){
+                printf("\nDoppelte Eckpunkte: x: %lf y: %lf\nquitting...", array[X][i], array[Y][i]);
                 exit(EXIT_FAILURE);
             }
         }
@@ -80,23 +86,21 @@ int main()
     //Area calculation
 
     for(i = 0;i < counter - 1;i++) {
-        sum1 += array[0][i] * array[1][i + 1];
-        sum2 += array[1][i] * array[0][i + 1];
+        sum1 += array[X][i] * array[Y][i + 1];
+        sum2 += array[Y][i] * array[X][i + 1];
     }
-    sum1 += array[0][counter - 1] * array[1][0];
-    sum2 += array[1][counter - 1] * array[0][0];
+    sum1 += array[X][counter - 1] * array[Y][0];
+    sum2 += array[Y][counter - 1] * array[X][0];
     double total_area = fabs(sum1 - sum2) * 0.5;
 
     //Geometric focus calculation
     double x_point = 0, y_point = 0;
-
-    for(i = 0;i < counter;i++){
-        x_point += ((array[0][i] + array[0][i + 1]) * ((array[0][i] * array[1][i + 1]) - (array[0][i + 1] * array[1][i])));
-        y_point += ((array[1][i] + array[1][i + 1]) * ((array[0][i] * array[1][i + 1]) - (array[0][i + 1] * array[1][i])));
+    for(i = 0;i < counter;++i){
+        x_point += (array[X][i] + array[X][(i + 1) % counter]) * ((array[X][i] * array[Y][(i + 1) % counter]) - (array[X][(i + 1) % counter] * array[Y][i]));
+        y_point += (array[Y][i] + array[Y][(i + 1) % counter]) * ((array[X][i] * array[Y][(i + 1) % counter]) - (array[X][(i + 1) % counter] * array[Y][i]));
     }
-    x_point *= (1 / (6 * total_area));
-    y_point *= (1 / (6 * total_area));
-
+    x_point /= (6.0 * total_area);
+    y_point /= (6.0 * total_area);
 
     // output results
     printf("\nErgebnisse:\n");
@@ -106,10 +110,11 @@ int main()
     printf("Y: %lf", y_point);
 
 
+
     //User Input for point
     printf("\n\nPunkt zum Boren angeben\nX: ");
     //If scanf gets wrong input exit
-    if(scanf("%lf", &X) != 1){
+    if(scanf("%lf", &x) != 1){
         printf("\nWrong input quitting...");
         exit(EXIT_FAILURE);
     }
@@ -118,7 +123,7 @@ int main()
     while (getchar() != '\n');
     printf("\nY: ");
     //If scanf gets wrong input exit
-    if(scanf("%lf", &Y) != 1){
+    if(scanf("%lf", &y) != 1){
         printf("\nWrong input quitting...");
         exit(EXIT_FAILURE);
     }
@@ -126,10 +131,11 @@ int main()
     //Call function
     int check_for_point = pnpoly(counter - 1, &array[0][0], &array[1][0], X, Y);
 
+    //Check the return value and react accordingly
     if(check_for_point == 0){
-        printf("\nPunkt X: %lf Y: %lf ist nicht vorhanden", X , Y);
+        printf("\nPunkt X: %lf Y: %lf ist nicht vorhanden", x , y);
     }else if(check_for_point == 1){
-        printf("\nPunkt X: %lf Y: %lf ist vorhanden", X, Y);
+        printf("\nPunkt X: %lf Y: %lf ist vorhanden", x, y);
     }else{
         printf("\nsomething went  wrong\nquitting...");
         exit(EXIT_FAILURE);
