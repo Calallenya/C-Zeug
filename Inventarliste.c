@@ -8,11 +8,15 @@
 #include <string.h>
 #include <stdbool.h>
 
+#define MAX_NR_ITEMS 10000
+
 /*Struct to store some global variables*/
 
 struct global_variables {
     bool enough_items;
-    bool in_stock;
+    unsigned temp_array[MAX_NR_ITEMS];
+
+
 };
 
 /* structure to store all information about items */
@@ -31,7 +35,6 @@ struct item_s {
 };
 
 
-#define MAX_NR_ITEMS 10000
 struct global_variables global;
 /* all items in stock */
 struct item_s stock[MAX_NR_ITEMS];
@@ -83,29 +86,48 @@ void read_items_from_file(char *filename)
 
     // finally close the input file
     fclose(fp);
+    //Save amount of elements in stock
 }
 
 
-/* compare function for items which orders them by ID */
+/* Function to swap two entries */
+void swap(unsigned * array, unsigned index_1, unsigned index_2){
+    unsigned temp = array[index_1];
+    array[index_1] = array [index_2];
+    array[index_2] = temp;
+}
 
-int order_items_by_id(const void *i1, const void *i2)
+/* sorting function for items  */
+/*https://de.wikipedia.org/wiki/Bubblesort*/
+//void because the array gets saved in struct variable global.temp_array therefore there is no need to return something
+void order_items_by_position(unsigned *array, unsigned size_of_array)
 {
-    // first convert pointers to correct type
-    struct item_s *item1 = (struct item_s *)i1;
-    struct item_s *item2 = (struct item_s *)i2;
-    if( item1->id > item2->id ) return 1;
-    else if ( item1->id < item2->id ) return -1;
-    else return 0;
+
+    unsigned len = size_of_array, i, stop, j;
+    //Copy array to temp array
+    for(i = 0; i < len; i++){
+        global.temp_array[i] = array[i];
+    }
+
+    //Sort the array from low to high
+    for(i = 0; i < len; i++){
+        for(j = 0, stop = len-i;j < stop; j++){
+            if(global.temp_array[j] > global.temp_array[j + 1]){
+                swap(&global.temp_array[0], j, j+1);
+            }
+        }
+    }
 }
+
+
 
 
 /* function that checks whether some item is in stock */
 
 unsigned item_in_stock( unsigned item_id, unsigned amount) {
     for(unsigned i=0; i<stock_size; i++) {
-        //Check if item is in stock and whether quantity is quantity is even or bigger than the desired amount
+        //Check if item is in stock and whether quantity is even or bigger than the desired amount
         if(item_id == stock[i].id ){
-            global.in_stock = true;
             if (stock[i].quantity >= amount){
                 global.enough_items = true;
             }
@@ -115,23 +137,11 @@ unsigned item_in_stock( unsigned item_id, unsigned amount) {
     return -1;
 }
 
-
-
-// --- part 1
-
-void enter_desired_items(unsigned *id, unsigned *amount);
-
-
-
-// --- part 2
-
-struct item_s enter_new_item(unsigned id);
-void add_items_to_stock(unsigned id, unsigned nr);
-
 // --- part 3 (preliminary solution)
 
 void print_stock()
 {
+
     for(unsigned i=0; i<stock_size; i++)
         printf("%04i %s %s - rack %i/pos %i - #items: %i\n",
                stock[i].id,
@@ -153,7 +163,8 @@ void save_items_to_file(char *filename);
 int main()
 {
     //Variable declaration
-    unsigned id, amount, i;
+    unsigned id, amount, i, choice, choice2;
+    char char_choice, choice_1[16], choice_2[16];
     // print program header
     printf("\n\n");
     printf("HAUPTMENU\n");
@@ -173,7 +184,6 @@ int main()
         printf("(0) Programm beenden\n");
         printf("\nIhre Wahl: ");
 
-        unsigned  choice;
         scanf("%d", &choice);
         while (getchar() != '\n');
 
@@ -204,7 +214,6 @@ int main()
                 }
                 //Reset global variables
                 global.enough_items = false;
-                global.in_stock = false;
                 break;
 
             case 2:
@@ -214,21 +223,42 @@ int main()
                 while (getchar() != '\n');
 
                 i = item_in_stock(id, amount);
-                if(i != 1){
+                //If the element exists
+                if(i != -1){
                     printf("\nElement vorhanden:\n[ID: %i] [vorhandene Anzahl: %i]  ", stock[i].id, stock[i].quantity);
+                    //add amount of chosen elements to stock
                     stock[i].quantity += amount;
                     printf("\nElement %i wurde um %i Elemente erweitert\nAktuelle Anzahl %i\n",stock[i].id, amount, stock[i].quantity);
                 }else{
-                    printf("\nElement nicht vorhanden !\nNeues Element hinzufügen y/n\n");
-                    scanf("%d", &choice);
+                    //If Element does not exist
+                    printf("\nElement nicht vorhanden !\nNeues Element hinzufuegen y/n\n");
+                    scanf("%c", &char_choice);
                     while (getchar() != '\n');
-                    
+                    //If user wants to add element to stock
+                    if(char_choice == 'y' || char_choice == 'Y'){
+                        printf("\nFolgende Daten bitte eingeben: [Hersteller] [Model] [Regal] [Fach]\n");
+                        //Enter data with space seperated
+                        scanf("%s %s %i %i", choice_1, choice_2, &choice, &choice2);
+                        while (getchar() != '\n');
+                        //Add new element to stock
+                        stock[stock_size].id = id;
+                        stock[stock_size].quantity = amount;
+                        strcpy(stock[stock_size].model, choice_2);
+                        strcpy(stock[stock_size].manufacturer, choice_1);
+                        stock[stock_size].rack = choice;
+                        stock[stock_size].position = choice2;
+                        printf("\n%d Elemente von %s von %s wurde in Regal %d in Fach %d unter der ID: %d hinzugefuegt",stock[stock_size].quantity, stock[stock_size].model, stock[stock_size].manufacturer, stock[stock_size].rack, stock[stock_size].position, stock[stock_size].id);
+                        stock_size ++;
+                    }
                 }
                 break;
+
             case 3:
                 // save_items_to_file("lager.txt");
                 break;
             case 4:
+                order_items_by_position(&stock[0].rack, stock_size);
+                //order_items_by_position(&stock[0].position, stock_size);
                 print_stock();
                 break;
             case 0:
