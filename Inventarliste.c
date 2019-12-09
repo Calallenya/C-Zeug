@@ -1,3 +1,4 @@
+
 //
 //  stock.c
 //
@@ -5,7 +6,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
+/*Struct to store some global variables*/
+
+struct global_variables {
+    bool enough_items;
+    bool in_stock;
+};
 
 /* structure to store all information about items */
 
@@ -24,6 +32,7 @@ struct item_s {
 
 
 #define MAX_NR_ITEMS 10000
+struct global_variables global;
 /* all items in stock */
 struct item_s stock[MAX_NR_ITEMS];
 /* number of items in stock */
@@ -92,19 +101,27 @@ int order_items_by_id(const void *i1, const void *i2)
 
 /* function that checks whether some item is in stock */
 
-unsigned item_in_stock( unsigned item_id ) {
-    for(int i=0; i<stock_size; i++) {
-        if( item_id == stock[i].id ) return 1;
+unsigned item_in_stock( unsigned item_id, unsigned amount) {
+    for(unsigned i=0; i<stock_size; i++) {
+        //Check if item is in stock and whether quantity is quantity is even or bigger than the desired amount
+        if(item_id == stock[i].id ){
+            global.in_stock = true;
+            if (stock[i].quantity >= amount){
+                global.enough_items = true;
+            }
+            return i;
+        }
     }
-    return 0;
+    return -1;
 }
 
 
 
 // --- part 1
 
-void enter_desired_items(unsigned*, unsigned*);
-void remove_items_from_stock(unsigned id, unsigned nr);
+void enter_desired_items(unsigned *id, unsigned *amount);
+
+
 
 // --- part 2
 
@@ -136,14 +153,14 @@ void save_items_to_file(char *filename);
 int main()
 {
     //Variable declaration
-    int id, amount;
+    unsigned id, amount, i;
     // print program header
     printf("\n\n");
     printf("HAUPTMENU\n");
     printf("---------\n");
 
     // read intial stock from files
-    read_items_from_file("Lager.txt");
+    read_items_from_file("lager.txt");
 
     //
     do {
@@ -164,12 +181,49 @@ int main()
         switch(choice)
         {
             case 1:
-                printf("\nID und Menge eingeben: [ID] [MENGE]");
-                //Input should be ID separated by space to MENGE:ID MENGE  
+                printf("\nID und Menge eingeben: [ID] [MENGE]\n");
+                //Input should be ID separated by space to MENGE:ID MENGE
                 scanf("%d %d", &id, &amount);
+                while (getchar() != '\n');
+
+                i = item_in_stock(id, amount);
+                if(i != -1 ){
+                    printf("\n[ID: %i] [vorhandene Anzahl: %i]  ", stock[i].id, stock[i].quantity);
+                    //Check if enough items are in stock
+                    if(global.enough_items){
+                        stock[i].quantity -= amount;
+                        printf("\nLager wurden %i Elemente entnommen\n", amount);
+                    } else{
+                        printf("\nAngefragte Menge %i, uebersteigt vorhandene Menge %i !\nLager bleibt unveraendert\n", amount, stock[i].quantity);
+
+                    }
+
+                    //If item is not in stock
+                } else{
+                    printf("\nElement nicht vorhanden !\n");
+                }
+                //Reset global variables
+                global.enough_items = false;
+                global.in_stock = false;
                 break;
+
             case 2:
-                // TODO
+                printf("\nID und Menge eingeben: [ID] [MENGE]\n");
+                //Input should be ID separated by space to MENGE:ID MENGE
+                scanf("%d %d", &id, &amount);
+                while (getchar() != '\n');
+
+                i = item_in_stock(id, amount);
+                if(i != 1){
+                    printf("\nElement vorhanden:\n[ID: %i] [vorhandene Anzahl: %i]  ", stock[i].id, stock[i].quantity);
+                    stock[i].quantity += amount;
+                    printf("\nElement %i wurde um %i Elemente erweitert\nAktuelle Anzahl %i\n",stock[i].id, amount, stock[i].quantity);
+                }else{
+                    printf("\nElement nicht vorhanden !\nNeues Element hinzufügen y/n\n");
+                    scanf("%d", &choice);
+                    while (getchar() != '\n');
+                    
+                }
                 break;
             case 3:
                 // save_items_to_file("lager.txt");
@@ -185,4 +239,3 @@ int main()
 
     } while(1);
 }
-
