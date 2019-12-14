@@ -21,7 +21,7 @@ int main()
     //Array for saving x and y
     double array[2][200];
     // open the input file "messwerte.txt" for reading
-    fp = fopen("polygo.txt", "r");
+    fp = fopen("polygon.txt", "r");
     if (fp == NULL)
     {
         // if file could not be opened (wrong path, not readable, ...)
