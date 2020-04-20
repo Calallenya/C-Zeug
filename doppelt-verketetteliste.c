@@ -4,7 +4,7 @@
 //Data structure of an element
 typedef struct entry{
     int key;
-    //struct entry * p_prev;
+    struct entry * p_prev;
     struct entry * p_next;
 } entry_t;
 
@@ -36,10 +36,13 @@ void insert_element(list_t * liste, entry_t * new ,int position){
     //Head of the list
     if (position == 0) {
         new->p_next = liste->p_head;
-        liste->p_head = new;
+        new->p_prev = NULL;
         if (liste->length == 0){
             liste->p_tail = new;
+        } else{
+            liste->p_head->p_prev = new;
         }
+        liste->p_head = new;
     }
 
     //Tail of the list
@@ -53,6 +56,7 @@ void insert_element(list_t * liste, entry_t * new ,int position){
         }
         new->p_next = NULL;
         liste->p_tail->p_next = new;
+        new->p_prev = liste->p_tail;
         liste->p_tail = new;
     }
 
@@ -62,13 +66,16 @@ void insert_element(list_t * liste, entry_t * new ,int position){
         liste->p_curr = liste->p_head;
         //Move position forward
         for(int i = 0; i < position - 1; i++){
-            if(liste->p_curr->p_next == NULL){
-                return ;
-            }
+            /*if(liste->p_curr->p_next == NULL){
+                return;
+            }*/
             liste->p_curr = liste->p_curr->p_next;
         }
         new->p_next = liste->p_curr->p_next;
+        new->p_prev = liste->p_curr;
+        liste->p_curr->p_next->p_prev = new;
         liste->p_curr->p_next = new;
+
     }
 
     liste->length += 1;
@@ -81,6 +88,7 @@ void append_to_list(list_t *liste, entry_t *new){
         liste->p_head = new;
         liste->p_tail = new;
         liste->p_curr = new;
+        new->p_prev = NULL;
         new->p_next = NULL;
     }else {
         liste->p_curr = liste->p_head;
@@ -89,6 +97,7 @@ void append_to_list(list_t *liste, entry_t *new){
         }
 
         liste->p_curr->p_next = new;
+        new->p_prev = liste->p_tail;
         new->p_next = NULL;
         liste->p_tail = new;
     }
@@ -102,6 +111,15 @@ void print_list(list_t *list){
     for(int i = 0;i < list->length;i++){
         printf("%d\n", list->p_curr->key);
         list->p_curr = list->p_curr->p_next;
+    }
+}
+
+void print_reverse(list_t *list){
+    //Start at the beginning
+    list->p_curr = list->p_tail;
+    for(int i = 0;i < list->length;i++){
+        printf("%d\n", list->p_curr->key);
+        list->p_curr = list->p_curr->p_prev;
     }
 }
 
@@ -126,12 +144,14 @@ int main(){
         append_to_list(&liste, create_element(i));
     }
 
-    insert_element(&liste, create_element(2000), 1);
+    insert_element(&liste, create_element(2000), 5);
 
 
 
 
     print_list(&liste);
+    printf("\n\n");
+    print_reverse(&liste);
 
     //Free memory
     entry_t *temp;
