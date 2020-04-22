@@ -2,6 +2,9 @@
 #include<stdlib.h>
 #include<time.h>
 
+/*
+ * MADE FOR LINUX
+ */
 
 void swap(int *a, int *b){
     int temp;
@@ -96,7 +99,7 @@ int main(){
 
 
     if (check(number_array, size) == 1){
-		printf("\n\nList sorted correctly in %f Seconds", duration);
+		printf("\n\nList sorted correctly in %f Seconds\n", duration);
 	} else{
 		printf("\n\nList not sorted correctly in %f Seconds\n", duration);
 	}
