@@ -29,7 +29,7 @@ long long int selection_sort(int *array, int size){
         }
         swap(&array[smallest_index], &array[i]);
     }
-	return numbers_compared;
+return numbers_compared;
 }
 
 
