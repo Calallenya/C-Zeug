@@ -134,10 +134,13 @@ void to_screen_recursive(heap_t *root){
     if(root->left != NULL){
         to_screen_recursive(root->left);
     }
+
+    printf("%d\n", root->value);
+
     if(root->right != NULL){
         to_screen_recursive(root->right);
     }
-    printf("%d\n", root->value);
+
 }
 
 
