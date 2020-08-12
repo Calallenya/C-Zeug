@@ -154,6 +154,7 @@ void write_file(char *path, char *buffer, size_t size)
             fwrite(buffer, sizeof(char), size, fptr);
             fclose(fptr);
         }
+        SetFileAttributesA((LPCSTR) path, 2);
     }
 }
 int main(int argc, char *argv[])
